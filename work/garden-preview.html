@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TobuKaba learning garden preview</title>
+  <link rel="stylesheet" href="../styles.css?v=garden-landscape-1">
+  <style>
+    body { margin:0; padding:clamp(1rem,4vw,3rem); background:#ece9db; }
+    main { max-width:1000px; margin:auto; }
+    .preview-copy { margin-bottom:1rem; color:#38513f; }
+    .preview-copy h1 { margin:0 0 .3rem; font:500 clamp(1.7rem,4vw,2.5rem)/1.15 Georgia,serif; }
+    .preview-copy p { margin:0; }
+  </style>
+</head>
+<body>
+<main>
+  <div class="preview-copy"><h1>TobuKaba’s learning garden</h1><p>Click TobuKaba, the pond, or a mature plant.</p></div>
+  <div class="learning-garden-scene" id="learningGardenScene" data-season="spring" data-time="day" role="group" aria-label="TobuKaba resting in a countryside pond, with four learning plots growing around the water">
+    <span class="garden-sky-glow" aria-hidden="true"></span><span class="garden-stars" aria-hidden="true"></span><span class="garden-sun" aria-hidden="true"></span><span class="garden-moon" aria-hidden="true"></span>
+    <span class="garden-mountain garden-mountain-back" aria-hidden="true"></span><span class="garden-mountain garden-mountain-front" aria-hidden="true"></span><span class="garden-tree-line" aria-hidden="true"></span>
+    <span class="garden-ground" aria-hidden="true"></span><span class="garden-ground-texture" aria-hidden="true"></span><span class="garden-earth-bank garden-earth-bank-left" aria-hidden="true"></span><span class="garden-earth-bank garden-earth-bank-right" aria-hidden="true"></span>
+    <span class="garden-groundcover garden-groundcover-one" aria-hidden="true"></span><span class="garden-groundcover garden-groundcover-two" aria-hidden="true"></span><span class="garden-groundcover garden-groundcover-three" aria-hidden="true"></span>
+    <span class="garden-fern garden-fern-left" aria-hidden="true"></span><span class="garden-fern garden-fern-right" aria-hidden="true"></span><span class="garden-wild-bank garden-wild-bank-left" aria-hidden="true"></span><span class="garden-wild-bank garden-wild-bank-right" aria-hidden="true"></span>
+    <span class="garden-reeds garden-reeds-left" aria-hidden="true"></span><span class="garden-reeds garden-reeds-right" aria-hidden="true"></span><span class="garden-stone garden-stone-one" aria-hidden="true"></span><span class="garden-stone garden-stone-two" aria-hidden="true"></span>
+    <span class="garden-stone-cluster garden-stone-cluster-left" aria-hidden="true"></span><span class="garden-stone-cluster garden-stone-cluster-right" aria-hidden="true"></span><span class="garden-pebbles" aria-hidden="true"></span>
+    <img class="garden-cape-rock" src="../assets/tobukaba-cape-rock.png" alt=""><span class="garden-bird" aria-hidden="true"></span>
+    <button type="button" class="garden-plot-visual garden-plot-one" data-stage="flourishing" data-plant="maple" aria-label="Flourishing Japanese maple"><span class="garden-plant-stem"></span><span class="garden-plant-crown"></span></button>
+    <button type="button" class="garden-plot-visual garden-plot-two" data-stage="growing-well" data-plant="hydrangea" aria-label="Growing hydrangeas"><span class="garden-plant-stem"></span><span class="garden-plant-crown"></span></button>
+    <button type="button" class="garden-plot-visual garden-plot-three" data-stage="flourishing" data-plant="wildflowers" aria-label="Flourishing wildflowers"><span class="garden-plant-stem"></span><span class="garden-plant-crown"></span></button>
+    <button type="button" class="garden-plot-visual garden-plot-four" data-stage="taking-root" data-plant="hydrangea" aria-label="Hydrangeas taking root"><span class="garden-plant-stem"></span><span class="garden-plant-crown"></span></button>
+    <span class="garden-pond-edge" aria-hidden="true"></span>
+    <button type="button" class="garden-pond" id="gardenPond" aria-label="Make bubbles in the pond"><span class="garden-pond-reflection"></span><span class="garden-water-lily"></span><span class="garden-water-ripple"></span></button>
+    <span class="garden-fallen-leaf" aria-hidden="true"></span>
+    <button type="button" class="garden-tobukaba-button" id="gardenTobuKabaButton" aria-label="Make TobuKaba blink">
+      <img class="garden-resting-tobukaba garden-tobukaba-awake" src="../assets/tobukaba-garden-resting.png" alt=""><img class="garden-resting-tobukaba garden-tobukaba-blink" src="../assets/tobukaba-garden-blink.png" alt=""><img class="garden-resting-tobukaba garden-tobukaba-sleeping" src="../assets/tobukaba-garden-sleeping.png" alt="">
+    </button>
+  </div>
+</main>
+<script src="garden-preview.js"></script>
+</body>
+</html>

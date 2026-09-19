@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Home Pond integration preview</title>
+  <link rel="stylesheet" href="../styles.css?v=home-pond-lily-1">
+  <style>
+    body { margin:0; padding:24px; background:#eceadd; }
+    main { width:min(1180px,100%); margin:auto; }
+    .preview-reduced-motion .home-pond-cloud-loop,
+    .preview-reduced-motion .home-pond-water-reflections,
+    .preview-reduced-motion .home-pond-lily-path,
+    .preview-reduced-motion .home-pond-waterline,
+    .preview-reduced-motion .home-pond-artwork-accent,
+    .preview-reduced-motion .home-pond-rare-event,
+    .preview-reduced-motion .pond-visitor-detail { display:none !important; }
+    .preview-reduced-motion .garden-resting-tobukaba,
+    .preview-reduced-motion .pond-visitor-breath { animation:none !important; }
+  </style>
+</head>
+<body>
+<main>
+  <div class="learning-garden-scene travel-home-scene" id="learningGardenScene" data-season="spring" data-time="day" role="img" aria-label="Spring Home Pond production preview">
+    <div class="home-pond-environment" id="homePondEnvironment" aria-hidden="true"></div>
+    <div class="home-pond-motion" id="homePondMotion" aria-hidden="true"></div>
+    <img class="home-pond-cape" id="homePondCape" src="../assets/home-pond/spring/cape-draped-v3.png" alt="">
+    <div class="pond-visitor-layer">
+      <button class="pond-visitor pond-visitor-map-tanuki" type="button" style="--visitor-left:76.5%;--visitor-top:35.5%;--visitor-width:13%" aria-label="Kotaro sleeping on his sunny stone"><span class="pond-visitor-breath"><img class="pond-visitor-base" src="../assets/companions/kotaro/kotaro-home-pond.png" alt=""><span class="pond-visitor-detail pond-visitor-ear" aria-hidden="true"><img src="../assets/companions/kotaro/kotaro-home-pond.png" alt=""></span><span class="pond-visitor-detail pond-visitor-tail" aria-hidden="true"><img src="../assets/companions/kotaro/kotaro-home-pond.png" alt=""></span></span></button>
+    </div>
+    <button type="button" class="garden-pond" id="gardenPond" aria-label="Make ripples in the Home Pond"></button>
+    <button type="button" class="garden-tobukaba-button" id="gardenTobuKabaButton" aria-label="Make TobuKaba blink">
+      <img class="garden-resting-tobukaba garden-tobukaba-awake" src="../assets/tobukaba-garden-resting.png" alt="">
+      <img class="garden-resting-tobukaba garden-tobukaba-blink" src="../assets/tobukaba-garden-blink.png" alt="">
+      <img class="garden-resting-tobukaba garden-tobukaba-sleeping" src="../assets/tobukaba-garden-sleeping.png" alt="">
+    </button>
+  </div>
+</main>
+<script src="../travel-content.js?v=home-pond-lily-1"></script>
+<script>
+  const pond = TOBUKABA_TRAVEL_CONTENT.homePond;
+  const scene = document.getElementById("learningGardenScene");
+  const previewParams = new URLSearchParams(location.search);
+  scene.dataset.time = previewParams.get("time") || "day";
+  if (previewParams.get("reduced") === "1") scene.classList.add("preview-reduced-motion");
+  if (previewParams.get("kotaro") === "0" || previewParams.get("travelling") === "kotaro") document.querySelector(".pond-visitor-layer").hidden = true;
+  if (previewParams.get("cape") === "0") document.getElementById("homePondCape").hidden = true;
+  document.getElementById("homePondEnvironment").innerHTML = pond.layers.map(layer => `<img class="home-pond-layer home-pond-layer-${layer.id}" src="../${layer.asset}" style="--home-pond-layer-depth:${layer.depth}" alt="">`).join("");
+  const hippo = pond.anchors.tobuKaba, water = pond.anchors.pondInteraction, motion = pond.motion;
+  scene.style.setProperty("--home-pond-hippo-left", `${hippo.left}%`);
+  scene.style.setProperty("--home-pond-hippo-top", `${hippo.top}%`);
+  scene.style.setProperty("--home-pond-hippo-width", `${hippo.width}%`);
+  scene.style.setProperty("--home-pond-interaction-left", `${water.left}%`);
+  scene.style.setProperty("--home-pond-interaction-top", `${water.top}%`);
+  scene.style.setProperty("--home-pond-interaction-width", `${water.width}%`);
+  scene.style.setProperty("--home-pond-interaction-height", `${water.height}%`);
+  const cloudMotion = motion.clouds, waterMotion = motion.water, lilyMotion = motion.lilyPad, rareEvent = motion.rareEvent, characterMotion = motion.characters;
+  scene.style.setProperty("--home-pond-cloud-seconds", `${cloudMotion.duration}s`);
+  scene.style.setProperty("--home-pond-cloud-delay", `${cloudMotion.delay}s`);
+  scene.style.setProperty("--home-pond-cloud-opacity", cloudMotion.opacity);
+  scene.style.setProperty("--home-pond-cloud-distance", `${cloudMotion.travelPercent}%`);
+  scene.style.setProperty("--home-pond-cloud-distance-negative", `${-cloudMotion.travelPercent}%`);
+  scene.style.setProperty("--home-pond-water-seconds", `${waterMotion.duration}s`);
+  scene.style.setProperty("--home-pond-water-delay", `${waterMotion.delay}s`);
+  scene.style.setProperty("--home-pond-water-opacity", waterMotion.opacity);
+  scene.style.setProperty("--home-pond-water-amplitude", `${waterMotion.amplitude}px`);
+  scene.style.setProperty("--home-pond-water-amplitude-negative", `${-waterMotion.amplitude}px`);
+  scene.style.setProperty("--home-pond-water-secondary-seconds", `${waterMotion.secondaryDuration}s`);
+  scene.style.setProperty("--home-pond-water-secondary-delay", `${waterMotion.secondaryDelay}s`);
+  scene.style.setProperty("--home-pond-water-secondary-opacity", waterMotion.secondaryOpacity);
+  scene.style.setProperty("--home-pond-water-scale", waterMotion.horizontalScale);
+  scene.style.setProperty("--home-pond-waterline-seconds", `${waterMotion.waterlineDuration}s`);
+  scene.style.setProperty("--home-pond-waterline-delay", `${waterMotion.waterlineDelay}s`);
+  scene.style.setProperty("--home-pond-lily-seconds", `${lilyMotion.duration}s`);
+  scene.style.setProperty("--home-pond-lily-delay", `${lilyMotion.delay}s`);
+  scene.style.setProperty("--home-pond-lily-opacity", lilyMotion.opacity);
+  scene.style.setProperty("--home-pond-lily-scale", lilyMotion.scale);
+  scene.style.setProperty("--home-pond-lily-start-x", `${lilyMotion.startXPercent}%`);
+  scene.style.setProperty("--home-pond-lily-end-x", `${lilyMotion.endXPercent}%`);
+  scene.style.setProperty("--home-pond-lily-y", `${lilyMotion.verticalPercent}%`);
+  scene.style.setProperty("--home-pond-lily-bob", `${lilyMotion.bobPixels}px`);
+  scene.style.setProperty("--home-pond-lily-rotation", `${lilyMotion.rotationDegrees}deg`);
+  scene.style.setProperty("--home-pond-lily-rotation-negative", `${-lilyMotion.rotationDegrees}deg`);
+  scene.style.setProperty("--home-pond-lily-clip", lilyMotion.clip);
+  scene.style.setProperty("--home-pond-rare-seconds", `${rareEvent.intervalSeconds}s`);
+  scene.style.setProperty("--home-pond-rare-delay", `${rareEvent.delay}s`);
+  scene.style.setProperty("--home-pond-rare-scale", rareEvent.scale);
+  scene.style.setProperty("--home-pond-hippo-float-seconds", `${characterMotion.tobuKaba.floatSeconds}s`);
+  scene.style.setProperty("--home-pond-hippo-float-pixels", `${characterMotion.tobuKaba.floatPixels}px`);
+  scene.style.setProperty("--home-pond-hippo-blink-seconds", `${characterMotion.tobuKaba.blinkSeconds}s`);
+  scene.style.setProperty("--home-pond-kotaro-breathe-seconds", `${characterMotion.kotaro.breatheSeconds}s`);
+  scene.style.setProperty("--home-pond-kotaro-ear-seconds", `${characterMotion.kotaro.earTwitchSeconds}s`);
+  scene.style.setProperty("--home-pond-kotaro-tail-seconds", `${characterMotion.kotaro.tailTwitchSeconds}s`);
+  const accent = item => `<span class="home-pond-artwork-accent accent-${item.kind} accent-${item.id}" style="--accent-depth:${item.depth};--accent-clip:${item.clip};--accent-origin:${item.origin};--accent-duration:${item.duration}s;--accent-delay:${item.delay}s;--accent-amplitude:${item.amplitude}deg;--accent-amplitude-negative:${-item.amplitude}deg"><img src="../${item.asset}" alt=""></span>`;
+  document.getElementById("homePondMotion").innerHTML = [
+    `<img class="home-pond-cloud-loop" src="../${cloudMotion.asset}" style="--motion-depth:${cloudMotion.depth}" alt="">`,
+    `<img class="home-pond-water-reflections home-pond-water-reflections-primary" src="../${waterMotion.asset}" style="--motion-depth:${waterMotion.depth}" alt="">`,
+    `<img class="home-pond-water-reflections home-pond-water-reflections-secondary" src="../${waterMotion.asset}" style="--motion-depth:${waterMotion.depth}" alt="">`,
+    `<span class="home-pond-waterline"><img src="../${waterMotion.asset}" alt=""></span>`,
+    `<span class="home-pond-lily-path" style="--motion-depth:${lilyMotion.depth}"><img class="home-pond-lily-pad" src="../${lilyMotion.asset}" alt=""></span>`,
+    ...motion.artworkAccents.map(accent),
+    `<img class="home-pond-rare-event" src="../${rareEvent.asset}" style="--motion-depth:${rareEvent.depth}" data-available-times="${rareEvent.availableTimes.join(' ')}" alt="">`
+  ].join('');
+</script>
+</body>
+</html>

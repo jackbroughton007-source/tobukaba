@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>TobuKaba — Kanji Writing SRS</title>
+
+<link rel="icon" href="data:,">
+
+<link rel="stylesheet" href="styles.css?v=home-pond-lily-1">
+
+</head>
+
+<body>
+
+<header class="site-hero">
+  <div class="hero-navigation" id="heroNavigation" hidden>
+    <div class="hero-navigation-inner">
+      <nav class="primary-navigation" aria-label="Primary navigation">
+        <button class="nav-link active" data-page="dashboard" onclick="showPage('dashboard')">Home</button>
+        <button class="nav-link" data-page="quiz" onclick="showPage('quiz')">Study</button>
+        <button class="nav-link" data-page="vocabulary" onclick="showPage('vocabulary')">Vocabulary</button>
+        <button class="nav-link" data-page="statistics" onclick="showPage('statistics')">Progress</button>
+        <button class="nav-link" data-page="backup" onclick="showPage('backup')">Data</button>
+      </nav>
+      <details class="navigation-account">
+        <summary>Account</summary>
+        <div class="navigation-account-menu">
+          <span class="account-email" id="accountEmail"></span>
+          <span id="syncStatus" class="sync-status" aria-live="polite"></span>
+          <button type="button" onclick="signOut()">Sign out</button>
+        </div>
+      </details>
+    </div>
+  </div>
+  <div class="hero-copy">
+    <p class="eyebrow">とぶかば · TobuKaba</p>
+    <h1>TobuKaba</h1>
+    <p class="hero-tagline">A quiet place to grow your kanji, one word at a time.</p>
+  </div>
+  <button type="button" class="season-label" id="seasonToggle" aria-label="Change season"><span class="season-icon" aria-hidden="true"></span><span class="season-name" aria-live="polite">Spring</span><span aria-hidden="true">↻</span></button>
+  <div class="hero-scene" aria-hidden="true">
+    <span class="stars"></span>
+    <span class="sun"></span>
+    <span class="moon"></span>
+    <span class="cloud cloud-one"></span>
+    <span class="cloud cloud-two"></span>
+    <span class="horizon-glow"></span>
+    <svg class="landscape" viewBox="0 0 1440 360" preserveAspectRatio="none" focusable="false">
+      <path class="mountain mountain-back" d="M0 290 C62 279 101 249 156 265 S232 297 294 270 S366 248 414 270 S488 296 552 277 S626 246 684 263 S768 295 836 278 S916 251 981 270 S1070 301 1142 281 S1257 254 1310 272 S1398 288 1440 279 L1440 360 L0 360 Z"/>
+      <path class="landscape-haze" d="M0 293 Q360 270 720 292 T1440 288 L1440 360 L0 360 Z"/>
+      <path class="mountain mountain-front" d="M0 322 C86 305 159 296 241 313 S398 334 479 311 S590 299 675 316 S804 332 901 308 S1043 298 1134 317 S1328 321 1440 302 L1440 360 L0 360 Z"/>
+    </svg>
+    <span class="season-tree"><span class="season-tree-branches"></span><span class="season-tree-canopy"></span><span class="season-tree-detail detail-one"></span><span class="season-tree-detail detail-two"></span></span>
+    <span class="hippo-wrap">
+      <span class="sleep-cloud"></span>
+      <img class="flying-hippo flying-hippo-awake" src="assets/tobukaba-mascot.png" alt="">
+      <img class="flying-hippo flying-hippo-sleeping" id="heroSleepingTobuKaba" src="assets/tobukaba-hero-sleeping.png" alt="">
+      <span class="sleep-marks">z<span>z</span></span>
+    </span>
+  </div>
+</header>
+
+<div id="authView" class="container auth-shell" hidden>
+
+<div class="card">
+<h2>Welcome to Kanji Writing SRS</h2>
+<p>Sign in to keep your vocabulary and progress synced across your devices.</p>
+
+<input id="authEmail" type="email" autocomplete="email" placeholder="Email address">
+<input id="authPassword" type="password" autocomplete="current-password" placeholder="Password (at least 6 characters)">
+
+<button class="primary-btn" type="button" onclick="signIn()">Sign in</button>
+<button class="primary-btn" type="button" onclick="signUp()" style="background:#555; margin-left:6px;">Create account</button>
+<p><button type="button" onclick="resetPassword()" style="border:0;background:none;color:#444;text-decoration:underline;">Forgot password?</button></p>
+<p id="authMessage" class="auth-message" role="status"></p>
+</div>
+
+</div>
+
+<div id="appShell" hidden>
+<div class="container">
+
+<!-- ================= DASHBOARD ================= -->
+
+<section id="dashboard" class="page active">
+
+<section class="home-study-focus" aria-labelledby="homeStudyTitle">
+  <div class="home-study-copy">
+    <p class="eyebrow" id="homeStudyKicker">YOUR NEXT STEP</p>
+    <h3 id="homeStudyTitle">Your words are ready.</h3>
+    <p id="homeStudyDescription">A small review now keeps your kanji growing.</p>
+    <div class="home-study-actions">
+      <button class="primary-btn home-study-cta" id="homeReviewCta" onclick="openStudy('reviews')">Start reviews</button>
+      <button class="secondary-btn home-study-cta" id="homeLessonCta" onclick="openStudy('lessons')">Learn new words</button>
+    </div>
+  </div>
+  <div class="home-study-status" aria-label="Today's study status">
+    <div class="home-queue-summary">
+      <div class="home-ready-count"><span id="dueWords">0</span><span class="home-ready-label">reviews due</span></div>
+      <div class="home-ready-count home-ready-count-secondary"><span id="newWords">0</span><span class="home-ready-label">new lessons</span></div>
+    </div>
+    <div class="home-goal-row"><span><strong id="todayLessons">0</strong> of <strong id="dailyGoalDisplay">20</strong> new words today</span><span id="homeGoalPercent">0%</span></div>
+    <div class="progress-bar" aria-hidden="true"><div class="progress-fill" id="goalProgress"></div></div>
+  </div>
+</section>
+
+<section class="home-journey-card" id="homeJourneyCard" aria-labelledby="homeJourneyTitle" aria-live="polite"></section>
+
+<aside class="morning-acknowledgement" id="morningAcknowledgement" hidden aria-live="polite">
+  <span class="morning-acknowledgement-mark" aria-hidden="true"></span>
+  <p id="morningAcknowledgementText"></p>
+  <button type="button" id="dismissMorningAcknowledgement" aria-label="Dismiss morning message">×</button>
+</aside>
+
+<section class="home-quiet-progress" aria-labelledby="quietProgressTitle">
+  <div class="home-section-heading">
+    <p class="eyebrow">QUIET PROGRESS</p>
+    <h3 id="quietProgressTitle">Your practice is taking root.</h3>
+  </div>
+  <div class="home-progress-list">
+    <div class="home-progress-item"><span class="home-progress-value" id="homeReviewsCompleted">0</span><span>reviews completed today</span></div>
+    <div class="home-progress-item"><span class="home-progress-value" id="streak">0</span><span>day return streak</span></div>
+    <div class="home-progress-item"><span class="home-progress-value" id="totalWords">0</span><span>words in your collection</span></div>
+  </div>
+</section>
+
+<div class="home-garden-link">
+  <button class="quiet-link-button" type="button" onclick="visitLearningGarden()">Visit the Home Pond</button>
+</div>
+
+<div class="home-secondary">
+  <details class="home-disclosure" id="homeDifficultWords">
+    <summary><span><strong>Words needing care</strong><small id="homeDifficultSummary">A quiet look at the words still in rotation.</small></span><span class="disclosure-mark" aria-hidden="true">+</span></summary>
+    <div class="home-disclosure-content" id="dashboardFailures"></div>
+  </details>
+
+  <details class="home-disclosure">
+    <summary><span><strong>Recent practice</strong><small>Your latest days of review.</small></span><span class="disclosure-mark" aria-hidden="true">+</span></summary>
+    <div class="home-disclosure-content" id="dashboardHistory"></div>
+  </details>
+
+  <details class="home-disclosure" id="studySettingsCard">
+    <summary><span><strong>Study settings</strong><small>Adjust your daily pace when it suits you.</small></span><span class="disclosure-mark" aria-hidden="true">+</span></summary>
+    <div class="home-disclosure-content">
+      <div class="form-grid">
+        <div><label for="dailyGoalInput">Daily new-word goal</label><input id="dailyGoalInput" type="number" min="1" max="500" step="1"></div>
+        <div><label for="chunkSizeInput">Session chunk size</label><input id="chunkSizeInput" type="number" min="1" max="100" step="1"></div>
+        <div>
+          <label for="strokeSpeedInput">Stroke animation speed</label>
+          <select id="strokeSpeedInput" onchange="previewStrokeSpeedSetting()">
+            <option value="relaxed">Relaxed</option>
+            <option value="standard">Standard</option>
+            <option value="quick">Quick</option>
+          </select>
+        </div>
+      </div>
+      <p>Your new-word goal sets a gentle daily lesson target. Reviews remain available whenever the SRS says a learned word is due. Stroke speed controls how quickly kanji stroke-order examples are drawn.</p>
+      <div class="stroke-speed-preview" aria-labelledby="strokeSpeedPreviewTitle">
+        <div>
+          <strong id="strokeSpeedPreviewTitle">Preview 日</strong>
+          <small id="strokeSpeedPreviewStatus" role="status" aria-live="polite">Change the speed to replay the example.</small>
+        </div>
+        <div class="stroke-speed-preview-canvas" id="strokeSpeedPreviewCanvas" aria-hidden="true"></div>
+        <button class="secondary-btn" type="button" onclick="previewStrokeSpeedSetting()">Replay preview</button>
+      </div>
+      <button class="primary-btn" onclick="saveStudySettings()">Save study settings</button><span id="settingsSaved" class="settings-saved" aria-live="polite"></span>
+    </div>
+  </details>
+</div>
+
+</section>
+
+
+<!-- ================= QUIZ ================= -->
+
+<section id="quiz" class="page">
+
+<div id="quizStart">
+
+<div class="card study-launcher">
+
+<div class="study-introduction">
+  <div class="study-introduction-copy">
+    <p class="eyebrow">WRITE, REMEMBER, RETURN</p>
+    <h2>Paper Writing Practice</h2>
+
+<p>
+The website will show you the English meaning and hiragana.
+Write the kanji <strong>on paper</strong>.
+</p>
+
+<p>Choose scheduled practice or learn a small set of untouched words.</p>
+  </div>
+  <aside class="study-mascot-encouragement" aria-label="Encouragement from TobuKaba">
+    <img src="assets/tobukaba-mascot2.png" alt="TobuKaba, the flying hippo">
+    <blockquote>“If I can learn to fly, you can learn kanji.”</blockquote>
+  </aside>
+</div>
+
+<div class="study-path-grid">
+  <article class="study-path study-path-reviews">
+    <p class="eyebrow">SCHEDULED PRACTICE</p>
+    <h3>Reviews</h3>
+    <strong id="reviewQueueCount" class="study-path-count">0 reviews due</strong>
+    <p>Previously learned words whose SRS time has arrived. Review availability is determined entirely by the SRS.</p>
+    <button class="primary-btn" id="startReviewsButton" onclick="startQuiz('reviews')">Start reviews</button>
+  </article>
+  <article class="study-path study-path-lessons">
+    <p class="eyebrow">MEET SOMETHING NEW</p>
+    <h3>Lessons</h3>
+    <strong id="lessonQueueCount" class="study-path-count">0 new words</strong>
+    <p>Learn new vocabulary through guided stroke practice and a recall check. A word counts toward your goal and enters Reviews only after you confirm it with OK.</p>
+    <button class="secondary-btn" id="startLessonsButton" onclick="startQuiz('lessons')">Start lessons</button>
+  </article>
+</div>
+
+</div>
+
+</div>
+
+
+<div id="quizArea" style="display:none;">
+
+<div class="quiz-card">
+
+<div id="quizCounter"></div>
+
+<div class="quiz-english" id="quizEnglish"></div>
+
+<div class="quiz-hiragana" id="quizHiragana"></div>
+
+<div class="paper-message">
+Write the kanji on paper now.
+</div>
+
+<div class="review-stage" id="quizProgress"></div>
+
+<div id="quizCategory"></div>
+
+        <div class="lesson-practice-answer" id="lessonPracticeAnswer" hidden aria-live="polite"></div>
+
+        <div class="answer-reveal-area" id="answerRevealArea">
+          <button class="show-answer-btn" id="showAnswerBtn" type="button" aria-label="Reveal the kanji answer" aria-pressed="false">
+            <span class="peek-prompt">Reveal the answer</span>
+            <span class="peek-hint">Hover, press, or use Space</span>
+            <span class="answer-content" id="kanjiAnswer" aria-live="polite"></span>
+          </button>
+        </div>
+        <div class="stroke-order-actions">
+          <button class="secondary-btn stroke-order-toggle" id="strokeOrderButton" type="button" aria-expanded="false" aria-controls="strokeOrderSection" hidden>View stroke order</button>
+        </div>
+        <section class="stroke-order-section" id="strokeOrderSection" aria-labelledby="strokeOrderTitle" hidden>
+          <div class="stroke-order-heading">
+            <div>
+              <p class="eyebrow">WRITING GUIDANCE</p>
+              <h3 id="strokeOrderTitle">Stroke order</h3>
+            </div>
+            <button class="stroke-order-close" id="strokeOrderClose" type="button" aria-label="Close stroke-order guidance">Close</button>
+          </div>
+          <p class="stroke-order-status" id="strokeOrderStatus" role="status" aria-live="polite"></p>
+          <div class="stroke-order-list" id="strokeOrderCharacters"></div>
+        </section>
+        <div class="lesson-practice-actions" id="lessonPracticeActions" hidden>
+          <button class="primary-btn" id="lessonPracticeContinue" type="button" onclick="continueLessonToConfirmation()" disabled>Continue to recall check</button>
+        </div>
+        <div class="lesson-round-transition" id="lessonRoundTransition" hidden>
+          <strong>Practice complete</strong>
+          <p>Now try recalling the new words. Their order has been shuffled.</p>
+          <button class="primary-btn" type="button" onclick="startLessonRecallRound()">Start recall checks</button>
+        </div>
+        <div class="lesson-confirmation-actions" id="lessonConfirmationActions" hidden>
+          <button class="secondary-btn lesson-review-again" type="button" onclick="reviewLessonAgain()">Review again</button>
+          <button class="primary-btn lesson-ok" type="button" onclick="completeLesson()">OK</button>
+        </div>
+        <div class="undo-row" id="undoRow">
+          <button class="undo-btn" id="undoButton" type="button" onclick="undoLastRating()" disabled>← Back / Undo last rating</button>
+        </div>
+        <div class="rating-buttons" id="reviewRatingButtons">
+
+<button class="again" onclick="rateWord('again')">
+AGAIN
+<br>
+<small id="ratingAgainHint">Couldn't recall or write it</small>
+</button>
+
+<button class="hard" onclick="rateWord('hard')">
+HARD
+<br>
+<small id="ratingHardHint">Correct, with effort</small>
+</button>
+
+<button class="good" onclick="rateWord('good')">
+GOOD
+<br>
+<small id="ratingGoodHint">Correct</small>
+</button>
+
+<button class="easy" onclick="rateWord('easy')">
+EASY
+<br>
+<small id="ratingEasyHint">Immediate recall</small>
+</button>
+
+</div>
+
+<div class="next-info" id="nextInfo"></div>
+
+</div>
+
+</div>
+
+
+<div id="quizFinished" style="display:none;">
+
+<div class="card" style="text-align:center;">
+
+<h2 id="quizFinishedTitle">Review complete</h2>
+
+<p id="quizResult"></p>
+
+<button class="primary-btn" id="nextChunkButton" onclick="startQuiz()">Start next chunk</button>
+
+    <button class="primary-btn" onclick="showPage('dashboard')">
+Back to Dashboard
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= VOCABULARY ================= -->
+
+<section id="vocabulary" class="page">
+
+<div class="page-heading-row">
+  <div>
+    <p class="eyebrow">YOUR LIBRARY</p>
+    <h2>Vocabulary</h2>
+  </div>
+  <div class="vocabulary-heading-actions">
+    <button class="secondary-btn" type="button" onclick="showPage('add')">Add your own word</button>
+    <button class="secondary-btn" id="wordCollectionsToggle" type="button" aria-expanded="false" aria-controls="wordCollectionsPanel" onclick="toggleWordCollections()">Browse word collections</button>
+  </div>
+</div>
+
+<section class="word-collections-panel" id="wordCollectionsPanel" aria-labelledby="wordCollectionsTitle" hidden>
+  <div class="word-collections-intro">
+    <div>
+      <p class="eyebrow">OPTIONAL STARTING POINTS</p>
+      <h3 id="wordCollectionsTitle">Choose words that feel useful to you.</h3>
+      <p>Browse small beginner collections, then add only the words you want to practise writing.</p>
+    </div>
+    <button class="quiet-link-button" type="button" onclick="toggleWordCollections(false)">Close collections</button>
+  </div>
+
+  <div class="word-collection-grid" id="wordCollectionGrid"></div>
+
+  <section class="word-collection-detail" id="wordCollectionDetail" aria-labelledby="activeCollectionTitle" hidden>
+    <div class="word-collection-detail-heading">
+      <div>
+        <p class="eyebrow">STARTER COLLECTION</p>
+        <h3 id="activeCollectionTitle"></h3>
+        <p id="activeCollectionDescription"></p>
+      </div>
+      <button class="quiet-link-button" type="button" onclick="closeWordCollection()">Back to collections</button>
+    </div>
+    <div class="word-collection-tools">
+      <button class="quiet-link-button" type="button" onclick="selectAllCollectionWords()">Select all available</button>
+      <button class="quiet-link-button" type="button" onclick="clearCollectionSelection()">Clear selection</button>
+    </div>
+    <div class="word-collection-list" id="wordCollectionList"></div>
+    <div class="word-collection-selection">
+      <span id="collectionSelectionCount" aria-live="polite">No words selected</span>
+      <button class="primary-btn" id="addSelectedCollectionWords" type="button" onclick="importSelectedCollectionWords()" disabled>Add selected words to Lessons</button>
+    </div>
+    <p class="collection-import-status" id="collectionImportStatus" role="status" aria-live="polite"></p>
+  </section>
+</section>
+
+<div class="card">
+
+<h3>Search & Filter</h3>
+
+<div class="filter-grid">
+
+<input
+type="text"
+id="searchInput"
+placeholder="Search..."
+oninput="renderVocabulary()"
+>
+
+<select id="categoryFilter" onchange="renderVocabulary()">
+<option value="">All Categories</option>
+</select>
+
+<select id="jlptFilter" onchange="renderVocabulary()">
+<option value="">All JLPT Levels</option>
+<option>N5</option>
+<option>N4</option>
+<option>N3</option>
+<option>N2</option>
+<option>N1</option>
+<option>Unknown</option>
+</select>
+
+<select id="statusFilter" onchange="renderVocabulary()">
+<option value="">All Statuses</option>
+<option value="new">New</option>
+<option value="due">Due now</option>
+<option value="learning">Learning</option>
+<option value="long-term">Long-term</option>
+<option value="leech">Problem Words</option>
+</select>
+
+<select id="sortFilter" onchange="renderVocabulary()">
+<option value="default">Sort: Default</option>
+<option value="dueSoonest">Next Due: Soonest</option>
+<option value="dueLatest">Next Due: Latest</option>
+</select>
+
+</div>
+
+</div>
+
+
+<div class="card vocabulary-table-card">
+
+<div class="table-container">
+
+<table>
+
+<colgroup class="vocabulary-columns">
+<col class="vocabulary-column-word">
+<col class="vocabulary-column-meaning">
+<col class="vocabulary-column-details">
+<col class="vocabulary-column-progress">
+<col class="vocabulary-column-actions">
+</colgroup>
+
+<thead>
+
+<tr>
+<th>Word</th>
+<th>Meaning</th>
+<th>Details</th>
+<th>Learning</th>
+<th>Actions</th>
+</tr>
+
+</thead>
+
+<tbody id="vocabularyTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= STATISTICS ================= -->
+
+<section id="statistics" class="page">
+
+<div class="page-heading-row progress-page-heading">
+  <div>
+    <p class="eyebrow">YOUR LEARNING JOURNEY</p>
+    <h2>Progress</h2>
+  </div>
+</div>
+
+<section class="learning-garden" id="learningGarden" aria-labelledby="learningGardenTitle">
+  <div class="learning-garden-heading">
+    <div>
+      <p class="eyebrow">HOME POND</p>
+      <h3 id="learningGardenTitle">A pond to return to, with friends met along the way.</h3>
+      <p id="gardenOverviewText">Study moves TobuKaba along a fixed journey. New companions can join him here when you discover them.</p>
+    </div>
+    <p class="learning-garden-note">Nothing is lost on a difficult day. Progress only moves forward.</p>
+  </div>
+
+  <div class="travel-completion" id="travelCompletion" role="status" aria-live="polite" hidden></div>
+
+  <div class="journey-summary" id="travelJourneyView" aria-label="Journey progress"></div>
+
+  <div class="travel-view" id="travelHomeView">
+
+  <div class="learning-garden-scene travel-home-scene" id="learningGardenScene" data-season="spring" data-time="day" role="group" aria-label="TobuKaba resting at the Home Pond with selected companions">
+    <div class="home-pond-environment" id="homePondEnvironment" aria-hidden="true"></div>
+    <div class="home-pond-motion" id="homePondMotion" aria-hidden="true"></div>
+    <img class="home-pond-cape" id="homePondCape" src="assets/home-pond/spring/cape-draped-v3.png" alt="" hidden>
+
+    <div class="pond-visitor-layer" id="pondVisitorLayer" aria-label="Friends visible around the pond"></div>
+
+    <button type="button" class="garden-pond" id="gardenPond" aria-label="Make ripples in the Home Pond"></button>
+    <button type="button" class="garden-tobukaba-button" id="gardenTobuKabaButton" aria-label="Make TobuKaba blink">
+      <img class="garden-resting-tobukaba garden-tobukaba-awake" id="gardenAwakeTobuKaba" src="assets/tobukaba-garden-resting.png" alt="">
+      <img class="garden-resting-tobukaba garden-tobukaba-blink" id="gardenBlinkTobuKaba" src="assets/tobukaba-garden-blink.png" alt="">
+      <img class="garden-resting-tobukaba garden-tobukaba-sleeping" id="gardenSleepingTobuKaba" src="assets/tobukaba-garden-sleeping.png" alt="">
+    </button>
+  </div>
+
+  <div class="garden-plot-controls" id="gardenPlotControls"></div>
+  </div>
+</section>
+
+<div class="stats-grid">
+
+<div class="stat-card">
+<div class="stat-number" id="statLessons">0</div>
+Lessons Completed
+</div>
+
+<div class="stat-card">
+<div class="stat-number" id="statReviews">0</div>
+Total Reviews
+</div>
+
+<div class="stat-card">
+<div class="stat-number" id="statAccuracy">0%</div>
+Successful Ratings
+</div>
+
+<div class="stat-card">
+<div class="stat-number" id="statLongTerm">0</div>
+Long-term Words
+</div>
+
+<div class="stat-card">
+<div class="stat-number" id="statFailures">0</div>
+Total Mistakes
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>Top 10 Most Failed</h3>
+
+<div id="topFailures"></div>
+
+</div>
+
+
+<div class="card">
+
+<h3>Problem Words</h3>
+
+<p>
+Words with 8 or more mistakes are automatically marked as problem words.
+</p>
+
+<div id="leechList"></div>
+
+</div>
+
+
+<div class="card">
+
+<h3>Review History</h3>
+
+<div id="reviewHistory"></div>
+
+</div>
+
+</section>
+
+
+<!-- ================= ADD WORD ================= -->
+
+<section id="add" class="page">
+
+<div class="page-heading-row">
+  <div>
+    <p class="eyebrow">VOCABULARY</p>
+    <h2>Add a word</h2>
+  </div>
+  <button class="quiet-link-button" type="button" onclick="showPage('vocabulary')">Back to vocabulary</button>
+</div>
+
+<div class="card">
+
+<div class="form-grid">
+
+<div>
+<label>English</label>
+<input id="newEnglish" placeholder="Certificate">
+</div>
+
+<div>
+<label>Kanji</label>
+<input id="newKanji" placeholder="証明書">
+</div>
+
+<div>
+<label>Hiragana</label>
+<input id="newHiragana" placeholder="しょうめいしょ">
+</div>
+
+<div>
+<label>JLPT Level</label>
+
+<select id="newJLPT">
+
+<option value="Unknown">Unknown</option>
+<option>N5</option>
+<option>N4</option>
+<option>N3</option>
+<option>N2</option>
+<option>N1</option>
+
+</select>
+
+</div>
+
+<div>
+<label>Category</label>
+
+<select id="newCategory">
+
+<option selected>No Category</option>
+<option>Daily Life</option>
+<option>Politics</option>
+<option>Environment</option>
+<option>Geography</option>
+<option>School</option>
+<option>Work</option>
+<option>Okinawa</option>
+<option>Travel</option>
+<option>Animals</option>
+<option>Food</option>
+<option>Other</option>
+
+</select>
+
+</div>
+
+<div>
+<label>Part of Speech</label>
+
+<select id="newPOS">
+
+<option>Noun</option>
+<option>Verb</option>
+<option>い-adjective</option>
+<option>な-adjective</option>
+<option>Adverb</option>
+<option>Expression</option>
+<option>Other</option>
+
+</select>
+
+</div>
+
+</div>
+
+<br>
+
+<button class="primary-btn" onclick="addWord()">
+Add Word
+</button>
+
+</div>
+
+</section>
+
+
+<!-- ================= BACKUP ================= -->
+
+<section id="backup" class="page">
+
+<section class="data-page-intro" aria-labelledby="dataPageTitle">
+  <div class="data-page-intro-copy">
+    <p class="eyebrow">YOUR STUDY DATA</p>
+    <h2 id="dataPageTitle">Backup &amp; Data</h2>
+    <p>Keep a spare copy of your words and progress, just in case.</p>
+  </div>
+  <div class="data-backup-mascot">
+    <span class="data-mascot-message" lang="ja">念のため！</span>
+    <img src="assets/tobukaba-backup-mascot.png" alt="">
+  </div>
+</section>
+
+<div class="card">
+
+<h3>Export Backup</h3>
+
+<p>
+Save all vocabulary, SRS progress, statistics and settings
+to a file.
+</p>
+
+<button class="primary-btn" onclick="exportData()">
+Export Backup
+</button>
+
+</div>
+
+
+<div class="card">
+
+<h3>Import Backup</h3>
+
+<p>
+Import a backup file to restore your vocabulary and progress.
+</p>
+
+<input
+type="file"
+id="importFile"
+accept=".json"
+onchange="importData(event)"
+>
+
+</div>
+
+
+<div class="card">
+
+<h3>Reset</h3>
+
+<p>
+This will permanently delete your current vocabulary and progress
+from this browser.
+</p>
+
+<button
+class="primary-btn"
+onclick="resetAll()"
+style="background:#b71c1c;"
+>
+Reset Everything
+</button>
+
+</div>
+
+<details class="card data-attribution">
+<summary><strong>Stroke-order data and licences</strong></summary>
+<p>
+Optional stroke-order guidance uses
+<a href="https://github.com/chanind/hanzi-writer" target="_blank" rel="noopener noreferrer">Hanzi Writer 3.7.3</a>
+under the MIT License and Japanese character data from
+<a href="https://github.com/chanind/hanzi-writer-data-jp/tree/efbea0cb93ba0301475ae92f9d3e512b9e4cd2ca" target="_blank" rel="noopener noreferrer">hanzi-writer-data-jp 0.0.2</a>.
+The Japanese data is separately licensed and is not MIT-licensed.
+</p>
+<ul>
+  <li><a href="licenses/hanzi-writer/LICENSE" target="_blank" rel="noopener noreferrer">Hanzi Writer MIT License</a></li>
+  <li><a href="licenses/hanzi-writer-data-jp/COPYING.txt" target="_blank" rel="noopener noreferrer">Japanese data copyright and provenance notice</a></li>
+  <li><a href="licenses/hanzi-writer-data-jp/ARPHICPL.TXT" target="_blank" rel="noopener noreferrer">Arphic Public License</a></li>
+  <li><a href="licenses/hanzi-writer-data-jp/LGPL.txt" target="_blank" rel="noopener noreferrer">GNU Lesser General Public License</a></li>
+</ul>
+<p>Only the individual public character requested for animation is sent to the data CDN. Account details, vocabulary records, and review results are never included.</p>
+</details>
+
+</section>
+
+</div>
+</div>
+
+
+<!-- ================= EDIT MODAL ================= -->
+
+<div id="editModal" class="modal">
+
+<div class="modal-content">
+
+<span class="close" onclick="closeEdit()">&times;</span>
+
+<h2>Edit Word</h2>
+
+<input type="hidden" id="editIndex">
+
+<label>English</label>
+<input id="editEnglish">
+
+<br><br>
+
+<label>Kanji</label>
+<input id="editKanji">
+
+<br><br>
+
+<label>Hiragana</label>
+<input id="editHiragana">
+
+<br><br>
+
+<label>JLPT</label>
+
+<select id="editJLPT">
+
+<option>Unknown</option>
+<option>N5</option>
+<option>N4</option>
+<option>N3</option>
+<option>N2</option>
+<option>N1</option>
+
+</select>
+
+<br><br>
+
+<label>Category</label>
+
+<select id="editCategory">
+
+<option>No Category</option>
+<option>Daily Life</option>
+<option>Politics</option>
+<option>Environment</option>
+<option>Geography</option>
+<option>School</option>
+<option>Work</option>
+<option>Okinawa</option>
+<option>Travel</option>
+<option>Animals</option>
+<option>Food</option>
+<option>Other</option>
+
+</select>
+
+<br><br>
+
+<label>Part of Speech</label>
+
+<select id="editPOS">
+
+<option>Noun</option>
+<option>Verb</option>
+<option>い-adjective</option>
+<option>な-adjective</option>
+<option>Adverb</option>
+<option>Expression</option>
+<option>Other</option>
+
+</select>
+
+<br><br>
+
+<button class="primary-btn" onclick="saveEdit()">
+Save Changes
+</button>
+
+</div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.7.3/dist/hanzi-writer.min.js"></script>
+<script src="word-collections.js?v=word-collections-2"></script>
+<script src="travel-content.js?v=companions-1"></script>
+<script src="travel-system.js?v=companions-1"></script>
+<script src="app.js?v=companions-1"></script>
+<script src="auth.js?v=companions-1"></script>
+
+</body>
+</html>
